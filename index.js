@@ -177,7 +177,7 @@ function parseMessages(messages) {
 
     if (isNewMessagesResponse(result)) {
       const parsedMessages = parseMessages(result.newMessages);
-      await writeMessagesToFile(parsedMessages, newMessage);
+     // await writeMessagesToFile(parsedMessages, newMessage);
       try {
         parsedMessages.forEach(async ({ region, alert, changed }) => {
           await client
