@@ -134,24 +134,15 @@ function getTime(message) {
   return new Date(message.date * 1000).toLocaleTimeString();
 }
 
-function getId(message) {
-  const res = message.match(/(?<=\#)(.*?)$/g)[0];
-  return idRegionsMoc[res] ? idRegionsMoc[res] : undefined;
-}
-
 function parseMessages(messages) {
-  let parsedMessages = [];
-  messages.forEach((messageData) => {
-    let idMessageData = getId(messageData.message);
-
-    if (idMessageData != undefined)
-      parsedMessages.push({
-        id: idMessageData,
-        region: getRegion(messageData.message),
-        alert: alarmState(messageData.message),
-        changed: getTime(messageData),
-      });
+  let parsedMessages = messages.map((messageData) => {
+    return {
+      region: getRegion(messageData.message),
+      alert: alarmState(messageData.message),
+      changed: getTime(messageData),
+    };
   });
+  
   return parsedMessages;
 }
 
@@ -188,12 +179,12 @@ function parseMessages(messages) {
       const parsedMessages = parseMessages(result.newMessages);
       await writeMessagesToFile(parsedMessages, newMessage);
       try {
-        parsedMessages.forEach(async ({ id, alert, changed }) => {
+        parsedMessages.forEach(async ({ region, alert, changed }) => {
           await client
             .db()
             .collection("regions")
             .updateOne(
-              { data: { $elemMatch: { id: id } } },
+              { data: { $elemMatch: { name: region } } },
               {
                 $set: {
                   "data.$.alert": alert,
