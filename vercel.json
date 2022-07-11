@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "api": "./index.js",
+      "use": "@now/node-server"
+    }
+  ],
+  "routes": [
+    {
+      "api": "/(.*)",
+
+      "dest": "index.js"
+    }
+  ],
+  "rewrites": [{ "source": "/api/(.*)", "destination": "/api" }]
+}
