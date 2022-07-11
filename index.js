@@ -210,4 +210,4 @@ function parseMessages(messages) {
 })();
 
 ///
-
+module.exports = app;
