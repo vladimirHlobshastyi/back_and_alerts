@@ -6,11 +6,12 @@
   "scripts": {
     "dev": "nodemon index js",
     "start": "node index.js",
-    "build": "npm run node index.js"
+    "build": "node index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bluebird": "^3.7.2",
     "express": "^4.18.1",
     "mongodb": "^4.7.0",
     "mongoose": "^6.4.3",
@@ -18,8 +19,8 @@
     "tg-cli-node": "^0.0.8"
   },
   "devDependencies": {
-    "nodemon": "^2.0.18",
     "input": "^1.0.1",
+    "nodemon": "^2.0.18",
     "telegram": "^2.8.6"
   }
 }

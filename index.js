@@ -21,10 +21,8 @@ const jsonParser = express.json();
 })();
 
 app.get("/all_regions", async (req, res) => {
-  const collection = req.app.locals.collection;
-
   try {
-    const regions = await client.db().collection("regions").find().toArray(); //<-
+    const regions = await client.db().collection("regions").find().toArray();
     res.send(regions[0].data);
   } catch (err) {
     return console.log(err);
@@ -32,11 +30,10 @@ app.get("/all_regions", async (req, res) => {
 });
 
 app.get("/region/:id", async (req, res) => {
-  const id = req.params.id; //<-
-  const collection = req.app.locals.collection;
+  const id = req.params.id;
 
   try {
-    const region = await collection.find().toArray();
+    const region = await client.db().collection("regions").find().toArray();
     res.send(region[0].data[id]);
   } catch (err) {
     return console.log(err);
@@ -70,6 +67,7 @@ process.on("SIGINT", async () => {
 });
 
 //
+
 const { Api, TelegramClient } = require("telegram");
 const { StringSession } = require("telegram/sessions");
 const input = require("input");
@@ -88,7 +86,7 @@ const clientTelegram = new TelegramClient(stringSession, apiId, apiHash, {});
 
 let pts = 17300; // TODO: get the pts value from previously saved message
 let messagesToPoll = 1;
-let pollingInterval = 10 * 1000; // 2 min
+let pollingInterval = 10 * 1000;
 
 function getNewMessages(pts, limit) {
   return clientTelegram.invoke(
@@ -121,9 +119,11 @@ async function writeMessagesToFile(data, file) {
 }
 
 function alarmState(message) {
-  if (message.match(/🟢/)) return false;
-  if (message.match(/🔴/)) return true;
-  if (message.match(/🟡/)) return "partial";
+  if (message.includes("Повітряна тривога в")) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 function getRegion(message) {
@@ -177,22 +177,23 @@ function parseMessages(messages) {
 
     if (isNewMessagesResponse(result)) {
       const parsedMessages = parseMessages(result.newMessages);
-      // await writeMessagesToFile(parsedMessages, newMessage);
+      //add new message document for debugging
+      await writeMessagesToFile(parsedMessages, newMessage);
       try {
-        parsedMessages.forEach(async ({ region, alert, changed }) => {
+        for (let oneRegion of parsedMessages) {
           await client
             .db()
             .collection("regions")
             .updateOne(
-              { data: { $elemMatch: { name: region } } },
+              { data: { $elemMatch: { name: oneRegion.region } } },
               {
                 $set: {
-                  "data.$.alert": alert,
-                  "data.$.changed": changed,
+                  "data.$.alert": oneRegion.alert,
+                  "data.$.changed": oneRegion.changed,
                 },
               }
             );
-        });
+        }
       } catch (err) {
         return console.log(err);
       }
@@ -210,4 +211,4 @@ function parseMessages(messages) {
 })();
 
 ///
-module.exports = app;
+//module.exports = app;
