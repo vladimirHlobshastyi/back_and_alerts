@@ -142,7 +142,7 @@ function parseMessages(messages) {
       changed: getTime(messageData),
     };
   });
-  
+
   return parsedMessages;
 }
 
@@ -177,7 +177,7 @@ function parseMessages(messages) {
 
     if (isNewMessagesResponse(result)) {
       const parsedMessages = parseMessages(result.newMessages);
-     // await writeMessagesToFile(parsedMessages, newMessage);
+      // await writeMessagesToFile(parsedMessages, newMessage);
       try {
         parsedMessages.forEach(async ({ region, alert, changed }) => {
           await client
@@ -208,3 +208,6 @@ function parseMessages(messages) {
     }
   }, pollingInterval);
 })();
+
+///
+module.exports = app;
