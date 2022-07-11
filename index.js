@@ -211,4 +211,4 @@ function parseMessages(messages) {
 })();
 
 ///
-//module.exports = app;
+module.exports = app;
