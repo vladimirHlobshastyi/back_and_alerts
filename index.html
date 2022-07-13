@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Главная страница</title>
+  </head>
+  <body>
+    <form id="forms">
+      <input id="input" />
+      <button>Click</button>
+    </form>
+    <script>
+      let formE = document.getElementById("forms");
+      let input = document.getElementById("input");
+      let newWebsocket = new WebSocket("ws://localhost:3001/ws");
+      newWebsocket.onopen = () => {
+        console.log("opn!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        newWebsocket.send("ssss");
+      };
+      formE.addEventListener("submit", (e) => {
+        e.preventDefault();
+        newWebsocket.send(input.value);
+      });
+      let a;
+      newWebsocket.onmessage = (res) =>
+        console.log(JSON.parse(res.data));
+    </script>
+    Привет
+  </body>
+</html>
