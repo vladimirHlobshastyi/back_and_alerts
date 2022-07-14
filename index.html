@@ -12,9 +12,7 @@
     <script>
       let formE = document.getElementById("forms");
       let input = document.getElementById("input");
-      let newWebsocket = new WebSocket(
-        /* "ws://localhost:3001/ws", */ "wss://back-and-alerts.vercel.app/ws"
-      );
+      let newWebsocket = new WebSocket("ws://localhost:3001/ws/echo");
       newWebsocket.onopen = () => {
         console.log("opn!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         newWebsocket.send("ssss");

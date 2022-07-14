@@ -60,6 +60,7 @@ app.post("/region", jsonParser, async (req, res) => {
     return console.log(err);
   }
 });
+
 process.on("SIGINT", async () => {
   await client.close();
   console.log("Приложение завершило работу");
@@ -82,7 +83,7 @@ let stringSession = new StringSession(
 
 const clientTelegram = new TelegramClient(stringSession, apiId, apiHash, {});
 
-let pts = 17550; // TODO: get the pts value from previously saved message
+let pts = 17700; // TODO: get the pts value from previously saved message
 let messagesToPoll = 1;
 let pollingInterval = 10 * 1000;
 
@@ -98,6 +99,8 @@ function getNewMessages(pts, limit) {
   );
 }
 
+//Functions for parse message
+
 function isTooManyUpdates(response) {
   return response && response.className === "updates.ChannelDifferenceTooLong";
 }
@@ -105,16 +108,6 @@ function isTooManyUpdates(response) {
 function isNewMessagesResponse(response) {
   return response && response.className === "updates.ChannelDifference";
 }
-
-/* async function writeMessagesToFile(data, file) {
-  try {
-    // write received messages to the local file
-    await fs.writeFile(file, JSON.stringify(data));
-  } catch (err) {
-    console.log("Append file error: ", err.message);
-    await fs.writeFile(file, JSON.stringify(data));
-  }
-} */
 
 function alarmState(message) {
   if (message.includes("Повітряна тривога в")) {
@@ -144,18 +137,8 @@ function parseMessages(messages) {
   return parsedMessages;
 }
 
+// problems with websocket connection
 (async function () {
-  // for initial req only - to get the StringSession value
-  /*  await client.start({
-    phoneNumber: async () => await input.text("Please enter your number: "),
-    password: async () => await input.text("Please enter your password: "),
-    phoneCode: async () =>
-      await input.text("Please enter the code you received: "),
-    onError: (err) => console.log(err),
-  });
-  stringSession = client.session.save();
-  console.log(stringSession); */
-
   await clientTelegram.connect();
   /*   app.ws("/ws", async (ws, req) => { */
   setInterval(async () => {
@@ -175,7 +158,6 @@ function parseMessages(messages) {
 
     if (isNewMessagesResponse(result)) {
       const parsedMessages = parseMessages(result.newMessages);
-      // await writeMessagesToFile(parsedMessages, newMessage);  //add new message document for debugging
 
       try {
         for (let oneRegion of parsedMessages) {
@@ -216,6 +198,3 @@ function parseMessages(messages) {
   }, pollingInterval);
   /* }); */
 })();
-
-///
-/* module.exports = app; */
