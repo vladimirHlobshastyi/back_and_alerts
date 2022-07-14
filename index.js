@@ -157,64 +157,64 @@ function parseMessages(messages) {
   console.log(stringSession); */
 
   await clientTelegram.connect();
-  app.ws("/ws", async (ws, req) => {
-    setInterval(async () => {
-      console.log("Sending request...");
-      console.log("pts: ", pts);
-      let result = await getNewMessages(pts, messagesToPoll);
+  /*   app.ws("/ws", async (ws, req) => { */
+  setInterval(async () => {
+    console.log("Sending request...");
+    console.log("pts: ", pts);
+    let result = await getNewMessages(pts, messagesToPoll);
 
-      // too many new messages available, try to read them all before proceeding
-      while (isTooManyUpdates(result)) {
-        messagesToPoll += 50;
-        console.log(
-          "Too many updates, increasing the receiving messages number to ",
-          messagesToPoll
-        );
-        result = await getNewMessages(pts, messagesToPoll);
-      }
+    // too many new messages available, try to read them all before proceeding
+    while (isTooManyUpdates(result)) {
+      messagesToPoll += 50;
+      console.log(
+        "Too many updates, increasing the receiving messages number to ",
+        messagesToPoll
+      );
+      result = await getNewMessages(pts, messagesToPoll);
+    }
 
-      if (isNewMessagesResponse(result)) {
-        const parsedMessages = parseMessages(result.newMessages);
-        // await writeMessagesToFile(parsedMessages, newMessage);  //add new message document for debugging
+    if (isNewMessagesResponse(result)) {
+      const parsedMessages = parseMessages(result.newMessages);
+      // await writeMessagesToFile(parsedMessages, newMessage);  //add new message document for debugging
 
-        try {
-          for (let oneRegion of parsedMessages) {
-            await ws.send(
+      try {
+        for (let oneRegion of parsedMessages) {
+          /*  await ws.send(
               JSON.stringify({
                 region: oneRegion.region,
                 alert: oneRegion.alert,
                 changed: oneRegion.changed,
               })
+            ); */
+
+          await client
+            .db()
+            .collection("regions")
+            .updateOne(
+              { data: { $elemMatch: { name: oneRegion.region } } },
+              {
+                $set: {
+                  "data.$.alert": oneRegion.alert,
+                  "data.$.changed": oneRegion.changed,
+                },
+              }
             );
-
-            await client
-              .db()
-              .collection("regions")
-              .updateOne(
-                { data: { $elemMatch: { name: oneRegion.region } } },
-                {
-                  $set: {
-                    "data.$.alert": oneRegion.alert,
-                    "data.$.changed": oneRegion.changed,
-                  },
-                }
-              );
-          }
-        } catch (err) {
-          return console.log(err);
         }
-        pts = result.pts;
-        messagesToPoll = 1; // decreasing the messages number to initial
-
-        console.log(
-          "Got the response, number of new messages: ",
-          result.newMessages.length
-        );
-      } else {
-        console.log("No updates");
+      } catch (err) {
+        return console.log(err);
       }
-    }, pollingInterval);
-  });
+      pts = result.pts;
+      messagesToPoll = 1; // decreasing the messages number to initial
+
+      console.log(
+        "Got the response, number of new messages: ",
+        result.newMessages.length
+      );
+    } else {
+      console.log("No updates");
+    }
+  }, pollingInterval);
+  /* }); */
 })();
 
 ///
