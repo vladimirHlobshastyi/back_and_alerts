@@ -12,16 +12,11 @@
     <script>
       let formE = document.getElementById("forms");
       let input = document.getElementById("input");
-      let newWebsocket = new WebSocket("ws://localhost:3001/ws/echo");
+      let newWebsocket = new WebSocket("ws://localhost:3001/ws");
       newWebsocket.onopen = () => {
-        console.log("opn!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        newWebsocket.send("ssss");
+        console.log("open ws channel");
       };
-      formE.addEventListener("submit", (e) => {
-        e.preventDefault();
-        newWebsocket.send(input.value);
-      });
-      let a;
+
       newWebsocket.onmessage = (res) => console.log(JSON.parse(res.data));
     </script>
     Привет
