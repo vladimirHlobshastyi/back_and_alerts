@@ -198,3 +198,5 @@ function parseMessages(messages) {
     }, pollingInterval);
   });
 })();
+
+module.exports = app;

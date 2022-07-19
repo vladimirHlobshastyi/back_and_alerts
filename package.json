@@ -10,16 +10,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "core-js": "^3.23.5",
     "express": "^4.18.1",
     "express-ws": "^5.0.2",
     "mongodb": "^4.7.0",
     "path": "^0.12.7",
-    "tg-cli-node": "^0.0.8",
-    "telegram": "^2.8.6"
+    "telegram": "^2.8.6",
+    "tg-cli-node": "^0.0.8"
   },
   "devDependencies": {
     "input": "^1.0.1",
-    "nodemon": "^2.0.18",
+    "nodemon": "^1.4.1",
     "telegram": "^2.8.6"
   }
 }
