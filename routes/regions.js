@@ -32,13 +32,15 @@ router.post("/region", jsonParser, async (req, res) => {
   const id = req.body.id;
   const alert = req.body.alert;
   const changed = req.body.changed;
-  const collection = req.app.locals.collection;
 
   try {
-    const setChangesInRegion = await collection.updateOne(
-      { data: { $elemMatch: { id: id } } },
-      { $set: { "data.$.alert": alert, "data.$.changed": changed } }
-    );
+    const setChangesInRegion = await client
+      .db()
+      .collection("regions")
+      .updateOne(
+        { data: { $elemMatch: { id: id } } },
+        { $set: { "data.$.alert": alert, "data.$.changed": changed } }
+      );
 
     res.send(setChangesInRegion);
   } catch (err) {

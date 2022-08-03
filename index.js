@@ -3,7 +3,7 @@ const { MongoClient } = require("mongodb");
 const uri =
   "mongodb+srv://Rikke:2607@cluster0.gwqbdq7.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 const app = express();
 const expressWs = require("express-ws")(app);
@@ -12,8 +12,6 @@ const routeRegions = require("./routes/regions.js");
 (async () => {
   try {
     await client.connect();
-    const region = await client.db().collection("regions");
-    app.locals.collection = region;
     await app.listen(PORT);
     console.log("Сервер ожидает подключения...");
   } catch (err) {
@@ -22,6 +20,7 @@ const routeRegions = require("./routes/regions.js");
 })();
 
 //routing
+
 app.use(routeRegions);
 
 process.on("SIGINT", async () => {
@@ -42,6 +41,14 @@ let stringSession = new StringSession(
 
 const clientTelegram = new TelegramClient(stringSession, apiId, apiHash, {});
 
+//Functions for parse message
+
+const {
+  isTooManyUpdates,
+  isNewMessagesResponse,
+  parseMessages,
+} = require("./utils/functionsForParseMessage");
+
 let pts = 19935; // TODO: get the pts value from previously saved message
 let messagesToPoll = 1;
 let pollingInterval = 10 * 1000;
@@ -58,47 +65,9 @@ function getNewMessages(pts, limit) {
   );
 }
 
-//Functions for parse message
-
-function isTooManyUpdates(response) {
-  return response && response.className === "updates.ChannelDifferenceTooLong";
-}
-
-function isNewMessagesResponse(response) {
-  return response && response.className === "updates.ChannelDifference";
-}
-
-function alarmState(message) {
-  if (message.includes("Повітряна тривога в")) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-function getRegion(message) {
-  return message.match(/(?<=\#)(.*?)$/g)[0];
-}
-
-function getTime(message) {
-  return new Date(message.date * 1000).toLocaleTimeString();
-}
-
-function parseMessages(messages) {
-  let parsedMessages = messages.map((messageData) => {
-    return {
-      region: getRegion(messageData.message),
-      alert: alarmState(messageData.message),
-      changed: getTime(messageData),
-    };
-  });
-
-  return parsedMessages;
-}
-
-// problems with websocket connection
 (async function () {
   // for initial req only - to get the StringSession value
+  
   /*  await client.start({
     phoneNumber: async () => await input.text("Please enter your number: "),
     password: async () => await input.text("Please enter your password: "),
