@@ -12,7 +12,7 @@
     <script>
       let formE = document.getElementById("forms");
       let input = document.getElementById("input");
-      let newWebsocket = new WebSocket("ws://back-and-alerts-htr4esyjb-vladimirhlobchastyi.vercel.app/ws");
+      let newWebsocket = new WebSocket("ws://localhost:3001/ws");
       newWebsocket.onopen = () => {
         console.log("open ws channel");
       };
